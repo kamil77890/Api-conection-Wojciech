@@ -1,0 +1,59 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Air Quality Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="mb-4">Air Quality Dashboard</h1>
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Current Data</h2>
+          <p id="current-data"></p>
+        </div>
+        <div class="col-md-6">
+          <h2>All Data</h2>
+          <ul id="all-data"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+      // Fetch current data and display it
+      fetch("/s")
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("current-data").innerText =
+            JSON.stringify(data);
+        });
+
+      // Fetch all data and display it
+      fetch("/a")
+        .then((response) => response.json())
+        .then((data) => {
+          const allDataList = document.getElementById("all-data");
+          Object.entries(data).forEach(([timestamp, data]) => {
+            const listItem = document.createElement("li");
+            listItem.innerText = `Timestamp: ${timestamp}, Data: ${JSON.stringify(
+              data
+            )}`;
+            allDataList.appendChild(listItem);
+          });
+        });
+    </script>
+  </body>
+</html>
