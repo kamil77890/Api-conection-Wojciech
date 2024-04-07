@@ -9,4 +9,3 @@ def get_air_quality_for_warsaw():
     return data
 
 
-get_air_quality_for_warsaw()
