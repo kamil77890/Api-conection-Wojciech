@@ -39,10 +39,9 @@ def validate_data():
         'data': data["data"]
     }
 
-    required_pollution_fields = ['ts', 'aqius', 'maincn', 'mainus']
-    for field in required_pollution_fields:
+    required_fields = ['ts', 'aqius', 'maincn', 'mainus']
+    for field in required_fields:
         if field not in processed_data['data']['current']['pollution']:
-            print(processed_data['data']['current']['pollution'])
             return False
 
         return processed_data
