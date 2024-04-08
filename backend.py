@@ -1,53 +1,52 @@
-from client.my_client import get_air_quality_for_warsaw
+# backend.py
+
 import datetime
+from client.my_client import get_air_quality_for_warsaw
 
 
 class DataPersistence:
     def __init__(self):
-        self.data_store = {}
+        self.data_store = []
+        print(self.data_store)
 
-    def store_data(self, timestamp, data):
-        str_timestamp = str(timestamp)
-        self.data_store[str_timestamp] = data
+    def store_data(self, data):
+        if self._validate_data(data):
+            self.data_store.append(data)
+            return True
+        else:
+            return False
 
     def get_data(self):
-        print(self.data_store)
         return self.data_store
 
-    def update_data(self):
-        validated_data = self.validate_data()
-        if validated_data:
-            timestamp = validated_data["timestamp"]
-            data = validated_data["data"]
-            self.store_data(timestamp, data)
-        else:
-            print("Failed to update data.")
-
-    def validate_data(self):
-        data = get_air_quality_for_warsaw()
-        current_timestamp = datetime.datetime.now()
-        processed_data = {
-            'timestamp': current_timestamp,
-            'data': data
-        }
-
-        for key, value in processed_data.items():
-            if key == 'timestamp' and key == 'data':
-                timestamp_value = value
-                if timestamp_value == current_timestamp:
-                    continue
-
-            elif key == 'data':
-                data_value = value
-                state = data_value["state"]
-                city = data_value["city"]
-                country = data_value["country"]
-                if state == "Mazovia" and city == "Warsaw" and country == "Poland":
-                    return processed_data
-
-        return None
+    def get_closest_data(self, timestamp):
+        closest_data = None
+        closest_time_difference = float('inf')
+        for data in self.data_store:
+            time_difference = abs(
+                (data['timestamp'] - timestamp).total_seconds())
+            if time_difference < closest_time_difference:
+                closest_data = data
+                closest_time_difference = time_difference
+        return closest_data
 
 
-persistence = DataPersistence()
-persistence.update_data()
-persistence.get_data() 
+def validate_data():
+    data = get_air_quality_for_warsaw()
+    current_timestamp = datetime.datetime.now()
+    processed_data = {
+        'timestamp': current_timestamp,
+        'data': data["data"]
+    }
+
+    required_pollution_fields = ['ts', 'aqius', 'maincn', 'mainus']
+    for field in required_pollution_fields:
+        if field not in processed_data['data']['current']['pollution']:
+            print(processed_data['data']['current']['pollution'])
+            return False
+
+        return processed_data
+
+
+if __name__ == "__main__":
+    persistence = DataPersistence()
