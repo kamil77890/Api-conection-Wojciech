@@ -1,5 +1,3 @@
-# backend.py
-
 import datetime
 from client.my_client import get_air_quality_for_warsaw
 
