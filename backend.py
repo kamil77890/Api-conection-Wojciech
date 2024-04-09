@@ -8,7 +8,7 @@ class DataPersistence:
         print(self.data_store)
 
     def store_data(self, data):
-        if self._validate_data(data):
+        if data:
             self.data_store.append(data)
             return True
         else:
@@ -16,17 +16,6 @@ class DataPersistence:
 
     def get_data(self):
         return self.data_store
-
-    def get_closest_data(self, timestamp):
-        closest_data = None
-        closest_time_difference = float('inf')
-        for data in self.data_store:
-            time_difference = abs(
-                (data['timestamp'] - timestamp).total_seconds())
-            if time_difference < closest_time_difference:
-                closest_data = data
-                closest_time_difference = time_difference
-        return closest_data
 
 
 def validate_data():
@@ -41,9 +30,13 @@ def validate_data():
     for field in required_fields:
         if field not in processed_data['data']['current']['pollution']:
             return False
+        else:
+            persistence = DataPersistence()
+            persistence.store_data(processed_data)
 
-        return processed_data
+            return processed_data
 
 
 if __name__ == "__main__":
     persistence = DataPersistence()
+    persistence.store_data(validate_data())
