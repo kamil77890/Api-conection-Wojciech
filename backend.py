@@ -1,11 +1,10 @@
 import datetime
-from client.my_client import get_air_quality_for_warsaw
+from client.my_client import get_air_quality
 
 
 class DataPersistence:
     def __init__(self):
         self.data_store = []
-        print(self.data_store)
 
     def store_data(self, data):
         if data:
@@ -18,25 +17,23 @@ class DataPersistence:
         return self.data_store
 
 
-def validate_data():
-    data = get_air_quality_for_warsaw()
+def validate_data(city):
+    data = get_air_quality(city)
+    persistence = DataPersistence()
     current_timestamp = datetime.datetime.now()
+
+    if data is None:
+        return False
+
     processed_data = {
         'timestamp': current_timestamp,
         'data': data["data"]
     }
 
-    required_fields = ['ts', 'aqius', 'maincn', 'mainus']
-    for field in required_fields:
-        if field not in processed_data['data']['current']['pollution']:
-            return False
-        else:
-            persistence = DataPersistence()
-            persistence.store_data(processed_data)
+    weater_data = processed_data["data"]["current"]["weather"]
 
-            return processed_data
-
-
-if __name__ == "__main__":
-    persistence = DataPersistence()
-    persistence.store_data(validate_data())
+    if weater_data["tp"] > 150 or weater_data["pr"] > 2000 or weater_data["ws"] > 1000000:
+        return False
+    else:
+        persistence.store_data(processed_data)
+        return processed_data
