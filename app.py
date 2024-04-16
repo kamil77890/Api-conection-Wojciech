@@ -1,46 +1,39 @@
 from flask import Flask, jsonify
-from backend import DataPersistence, validate_data
-from client.my_client import get_cites
+from flask.views import MethodView
+from dotenv import load_dotenv
+from client.my_client import get_from_api
+from persistence import DataPersistence
+from controllers import WeatherDataController
+import datetime
+import os
 
 app = Flask(__name__)
 
-persistence = DataPersistence()
+
+class PollutionDataView(MethodView):
+    def __init__(self):
+        self.p = DataPersistence()
+        self.controller = WeatherDataController()
+
+    def get(self):
+        load_dotenv()
+        key = os.getenv("API_KEY")
+
+        city = "Warsaw"
+        state = "Mazovia"
+        country = "Poland"
+
+        api_data = get_from_api(
+            city, state, country, key)
+
+        if api_data is None:
+            print("not good :()")
+        else:
+            self.controller.add_data_to_persistency(api_data, self.p)
+            return jsonify(api_data)
 
 
-@app.route("/")
-def getting_date():
-    data = validate_data("Warsaw")
-    if data:
-        persistence.store_data(data)
-        return jsonify(data)
-    else:
-        return jsonify({"Nie ma danych, pernie api się wywaliło ;)"}), 404
+app.add_url_rule('/weather', view_func=PollutionDataView.as_view('weather'))
 
-
-@app.route("/data")
-def all_data():
-    data = persistence.get_data()
-    return jsonify(data)
-
-
-@app.route("/city")
-def cites_data():
-    data = get_cites()
-    if data:
-        return jsonify(data)
-    else:
-        return jsonify({"Nie ma danych, pernie api się wywaliło ;)"}), 404
-
-
-@app.route("/city/<string:param>")
-def get_data_for_all_bigger_cities_in_Mazovia(param):
-    city = param
-    data = validate_data(city)
-    if data:
-        return jsonify(data)
-    else:
-        return jsonify({"Nie ma danych, pernie api się wywaliło ;)"}), 404
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run()
