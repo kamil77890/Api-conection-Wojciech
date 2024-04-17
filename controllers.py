@@ -9,10 +9,9 @@ class WeatherDataController:
         pass
 
     def add_data_to_persistency(self, data: dict, persistency) -> bool:
+        Data = validate_data(data)
         if validate_data(data):
-            persistency.store_data(data)
+            persistency.store_data(Data)
             return True
         else:
             return False
-
-

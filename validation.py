@@ -13,6 +13,7 @@ def validate_data(data):
     current_timestamp = datetime.datetime.now()
 
     if data is None:
+        print("ja")
         return False
 
     processed_data = {
@@ -25,5 +26,5 @@ def validate_data(data):
 
     if weather_data["tp"] > 150 or weather_data["pr"] > 2000 or weather_data["ws"] > 1000000:
         return False
-    else:
-        return processed_data
+
+    return processed_data
