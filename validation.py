@@ -1,6 +1,5 @@
 import datetime
 from pydantic import BaseModel
-from typing import Any
 
 
 class Args(BaseModel):
@@ -13,7 +12,6 @@ def validate_data(data):
     current_timestamp = datetime.datetime.now()
 
     if data is None:
-        print("ja")
         return False
 
     processed_data = {
